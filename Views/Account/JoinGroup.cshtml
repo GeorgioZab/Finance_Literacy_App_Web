@@ -1,0 +1,27 @@
+﻿@model Finance_Literacy_App_Web.Models.Group
+
+@{
+    ViewData["Title"] = "Join Group";
+}
+
+<h1>Join a Group</h1>
+
+<form asp-action="JoinGroup" method="post">
+    <div class="form-group mb-3">
+        <label for="inviteCode" class="form-label">Invite Code</label>
+        <input type="text" name="inviteCode" class="form-control" value="@Model" required />
+        <span asp-validation-for="InviteCode" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Join</button>
+    <a asp-action="Index" asp-controller="Home" class="btn btn-secondary">Cancel</a>
+</form>
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger mt-3">
+        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+        {
+            <p>@error.ErrorMessage</p>
+        }
+    </div>
+}

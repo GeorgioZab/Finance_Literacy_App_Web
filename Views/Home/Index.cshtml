@@ -1,0 +1,213 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<h1>Welcome to Finance Literacy App</h1>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success" role="alert">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger" role="alert">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+@if (User.IsInRole("admin"))
+{
+    <h2>Admin Dashboard</h2>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    <h5 class="card-title">Manage User</h5>
+                    <p class="card-text">View and edit user roles.</p>
+                    <a asp-controller="Admin" asp-action="ManageUser" class="btn btn-primary btn-sm">Go to Users</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    <h5 class="card-title">Manage Modules</h5>
+                    <p class="card-text">Create or modify lessons.</p>
+                    <a asp-controller="Admin" asp-action="ManageModules" class="btn btn-primary btn-sm">Go to Lessons</a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else if (User.IsInRole("teacher"))
+{
+    <h2>Teacher Dashboard</h2>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    <h5 class="card-title">Assign Lessons</h5>
+                    <p class="card-text">Assign lessons to your groups.</p>
+                    <a asp-controller="Teacher" asp-action="AssignLesson" class="btn btn-primary btn-sm">Assign Now</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    <h5 class="card-title">Manage Groups</h5>
+                    <p class="card-text">View and manage your groups.</p>
+                    <a asp-controller="Teacher" asp-action="Groups" class="btn btn-primary btn-sm">Go to Groups</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    <h5 class="card-title">Manage Deadlines</h5>
+                    <p class="card-text">View and manage lesson deadlines.</p>
+                    <a asp-controller="GroupLessonDeadlines" asp-action="Index" class="btn btn-primary btn-sm">View Deadlines</a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else if (User.IsInRole("user"))
+{
+    <h2>Available Lessons</h2>
+    @if (ViewData["AvailableLessons"] is List<Finance_Literacy_App_Web.Models.Lesson> lessons && lessons?.Any() == true)
+    {
+        <div class="row">
+            @foreach (var lesson in lessons)
+            {
+                var status = (ViewData["UserLessonStatuses"] as List<Finance_Literacy_App_Web.Models.UserLessonStatus>)
+                ?.FirstOrDefault(uls => uls.LessonId == lesson.Id)?.Status ?? "NotStarted";
+                var firstIncompleteLessonId = ViewData["FirstIncompleteLessonId"] as int?;
+                var isInGroup = ViewData["IsInGroup"] as bool? ?? false;
+                var groupLessonDeadlines = ViewData["GroupLessonDeadlines"] as List<Finance_Literacy_App_Web.Models.GroupLessonDeadline>;
+                var deadline = groupLessonDeadlines?.FirstOrDefault(gld => gld.LessonId == lesson.Id)?.Deadline;
+
+                <div class="col-md-4 mb-3">
+                    <div class="card lesson-card">
+                        <div class="card-body">
+                            <h5 class="card-title">@lesson.Title</h5>
+                            <p class="card-text">@lesson.Content</p>
+                            <p class="card-text"><strong>Status:</strong> @status</p>
+                            @if (isInGroup && deadline.HasValue)
+                            {
+                                <p class="card-text"><strong>Deadline:</strong> @deadline.Value.ToString("dd MMMM yyyy, HH:mm")</p>
+                                @if (deadline.Value < DateTime.UtcNow)
+                                {
+                                    <span class="badge bg-danger">Overdue</span>
+                                }
+                            }
+                            @if (status == "Completed")
+                            {
+                                <span class="badge bg-success">Completed</span>
+                                <a asp-controller="Lessons" asp-action="AnswerResults" asp-route-lessonId="@lesson.Id" class="btn btn-sm btn-info mt-2">View Answers</a>
+                            }
+                            else if (isInGroup) // Режим с учителем: все назначенные уроки открыты
+                            {
+                                <a asp-controller="Lessons" asp-action="Details" asp-route-id="@lesson.Id" class="btn btn-primary btn-sm">Start Lesson</a>
+                            }
+                            else if (firstIncompleteLessonId.HasValue && lesson.Id == firstIncompleteLessonId) // Самостоятельный режим
+                            {
+                                <a asp-controller="Lessons" asp-action="Details" asp-route-id="@lesson.Id" class="btn btn-primary btn-sm">Start Lesson</a>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Locked</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p>No lessons available at the moment.</p>
+    }
+}
+
+<style>
+    h1 {
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    h2 {
+        margin-top: 0;
+        color: #333;
+    }
+
+    .lesson-card, .dashboard-card {
+        background-color: #f9f9f9;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s;
+    }
+
+        .lesson-card:hover, .dashboard-card:hover {
+            transform: translateY(-3px);
+        }
+
+    .card-body {
+        padding: 15px;
+    }
+
+    .card-title {
+        margin-top: 0;
+        color: #555;
+        font-size: 1.25rem;
+    }
+
+    .card-text {
+        margin: 5px 0;
+        color: #666;
+    }
+
+    .btn-sm {
+        margin-right: 5px;
+        padding: 5px 10px;
+        font-size: 12px;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+        .btn-primary:hover {
+            opacity: 0.8;
+        }
+
+    .btn-info {
+        background-color: #17a2b8;
+        border-color: #17a2b8;
+    }
+
+        .btn-info:hover {
+            opacity: 0.8;
+        }
+
+    .badge {
+        font-size: 12px;
+        padding: 5px 10px;
+    }
+
+        .badge.bg-danger {
+            background-color: #dc3545 !important;
+        }
+
+    .row {
+        margin-top: 20px;
+    }
+
+    .col-md-4 {
+        display: flex;
+    }
+</style>

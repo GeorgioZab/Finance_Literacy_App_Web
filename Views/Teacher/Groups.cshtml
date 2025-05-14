@@ -1,0 +1,60 @@
+﻿@model IEnumerable<Finance_Literacy_App_Web.Models.Group>
+
+@{
+    ViewData["Title"] = "My Groups";
+}
+
+<h1>My Groups</h1>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger" role="alert">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<p>
+    <a asp-action="CreateGroup" class="btn btn-primary">Create New Group</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Invite Code</th>
+            <th>Users</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var group in Model)
+        {
+            <tr>
+                <td>@group.Name</td>
+                <td>@(group.InviteCode ?? "Not set")</td>
+                <td>
+                    @if (group.Users.Any())
+                    {
+                        <ul>
+                            @foreach (var user in group.Users)
+                            {
+                                <li>
+                                    @user.UserName
+                                    <a asp-action="RemoveUserFromGroup" asp-route-id="@group.Id" asp-route-userId="@user.Id" class="btn btn-sm btn-danger">Remove</a>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p>No users in this group.</p>
+                    }
+                </td>
+                <td>
+                    <a asp-action="ViewUserAnswers" asp-route-id="@group.Id" class="btn btn-sm btn-info">View Answers</a>
+                    <a asp-action="DeleteGroup" asp-route-id="@group.Id" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

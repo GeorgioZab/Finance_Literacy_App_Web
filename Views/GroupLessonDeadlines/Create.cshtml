@@ -1,0 +1,35 @@
+﻿@model Finance_Literacy_App_Web.Models.GroupLessonDeadline
+
+@{
+    ViewData["Title"] = "Create New Group Lesson Deadline";
+}
+
+<h1>Create New Group Lesson Deadline</h1>
+<form asp-action="Create" method="post">
+    <div class="form-group mb-3">
+        <label asp-for="GroupId" class="form-label">Group</label>
+        <select asp-items="ViewBag.Groups" asp-for="GroupId" class="form-control" required>
+            <option value="">Select a group</option>
+        </select>
+        <span asp-validation-for="GroupId" class="text-danger"></span>
+    </div>
+    <div class="form-group mb-3">
+        <label asp-for="LessonId" class="form-label">Lesson</label>
+        <select asp-items="ViewBag.Lessons" asp-for="LessonId" class="form-control" required>
+            <option value="">Select a lesson</option>
+        </select>
+        <span asp-validation-for="LessonId" class="text-danger"></span>
+    </div>
+    <div class="form-group mb-3">
+        <label asp-for="Deadline" class="form-label">Deadline</label>
+        <input asp-for="Deadline" type="datetime-local" class="form-control" required />
+        <span asp-validation-for="Deadline" class="text-danger"></span>
+    </div>
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <button type="submit" class="btn btn-primary">Create</button>
+    <a asp-action="Groups" asp-controller="Teacher" class="btn btn-secondary">Back to Groups</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

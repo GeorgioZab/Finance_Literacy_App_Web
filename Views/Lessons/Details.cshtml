@@ -1,0 +1,20 @@
+﻿@model Finance_Literacy_App_Web.Models.Lesson
+
+@{
+    ViewData["Title"] = "Lesson Details";
+}
+
+<h2>@Model.Title</h2>
+<p>Модуль: @Model.Module.Title</p>
+
+<form asp-action="SubmitAnswer" method="post">
+    @foreach (var task in Model.Tasks)
+    {
+        <div class="mb-3">
+            <label class="form-label">@task.Question</label>
+            <input type="text" name="answers[@task.Id]" class="form-control" required />
+            <input type="hidden" name="taskIds" value="@task.Id" />
+        </div>
+    }
+    <button type="submit" class="btn btn-primary">Submit Answers</button>
+</form>

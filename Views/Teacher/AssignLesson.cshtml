@@ -1,0 +1,14 @@
+﻿@model dynamic
+
+@{
+    ViewData["Title"] = "Assign Lesson to Group";
+}
+
+<h1>Assign Lesson to Group</h1>
+
+<p>
+    You will be redirected to create a new deadline for a group and lesson.
+</p>
+
+<a asp-controller="GroupLessonDeadlines" asp-action="Create" class="btn btn-primary">Proceed to Assign Deadline</a>
+<a asp-action="Groups" asp-controller="Teacher" class="btn btn-secondary">Cancel</a>

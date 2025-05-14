@@ -1,0 +1,22 @@
+﻿@model Finance_Literacy_App_Web.Models.User
+
+@{
+    ViewData["Title"] = "Edit User Role";
+}
+
+<h1>Edit Role for @Model.UserName</h1>
+
+<form asp-action="EditUserRole" method="post">
+    <input type="hidden" asp-for="Id" />
+    <div class="form-group mb-3">
+        <label for="role" class="form-label">Role</label>
+        <select name="role" class="form-control" required>
+            @foreach (var role in ViewData["Roles"] as List<string>)
+            {
+                <option value="@role" selected="@(role == Model.Role)">@role</option>
+            }
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-action="ManageUser" class="btn btn-secondary">Cancel</a>
+</form>

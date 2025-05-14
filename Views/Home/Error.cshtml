@@ -1,0 +1,23 @@
+﻿@model Finance_Literacy_App_Web.Models.ErrorViewModel
+
+@{
+    ViewData["Title"] = "Ошибка";
+}
+
+<h1>Произошла ошибка</h1>
+
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <div class="alert alert-danger">
+        @Model.Message
+    </div>
+}
+
+@if (Model.ShowRequestId)
+{
+    <p>
+        <strong>Идентификатор запроса:</strong> @Model.RequestId
+    </p>
+}
+
+<a asp-controller="Home" asp-action="Index">Вернуться на главную</a>

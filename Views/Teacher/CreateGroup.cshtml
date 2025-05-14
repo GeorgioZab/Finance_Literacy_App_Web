@@ -1,0 +1,17 @@
+﻿@model Finance_Literacy_App_Web.Models.Group
+
+@{
+    ViewData["Title"] = "Create Group";
+}
+
+<h1>Create New Group</h1>
+
+<form asp-action="CreateGroup" method="post">
+    <div class="form-group mb-3">
+        <label for="groupName" class="form-label">Group Name</label>
+        <input type="text" name="groupName" class="form-control" value="@Model" required />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Create</button>
+    <a asp-action="Index" asp-controller="Home" class="btn btn-secondary">Cancel</a>
+</form>

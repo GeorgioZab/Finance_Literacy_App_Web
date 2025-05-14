@@ -1,0 +1,54 @@
+﻿@model List<Finance_Literacy_App_Web.Models.UserTaskAnswer>
+
+@{
+    ViewData["Title"] = "User Answers";
+    var group = ViewBag.Group as Finance_Literacy_App_Web.Models.Group;
+}
+
+<h1>User Answers for Group: @group.Name</h1>
+
+@if (Model.Any())
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Lesson</th>
+                <th>Task Question</th>
+                <th>User Answer</th>
+                <th>Correct Answer</th>
+                <th>Result</th>
+                <th>Submitted At</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var answer in Model)
+            {
+                <tr>
+                    <td>@answer.User.UserName</td>
+                    <td>@answer.Task.Lesson.Title (Module: @answer.Task.Lesson.Module.Title)</td>
+                    <td>@answer.Task.Question</td>
+                    <td>@answer.Answer</td>
+                    <td>@answer.Task.CorrectAnswer</td>
+                    <td>
+                        @if (string.Compare(answer.Answer?.Trim(), answer.Task.CorrectAnswer?.Trim(), StringComparison.OrdinalIgnoreCase) == 0)
+                        {
+                            <span class="badge bg-success">Correct</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Incorrect</span>
+                        }
+                    </td>
+                    <td>@answer.SubmittedAt.ToString("g")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No answers have been submitted by users in this group.</p>
+}
+
+<a asp-action="Groups" class="btn btn-secondary mt-3">Back to Groups</a>

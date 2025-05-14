@@ -1,0 +1,49 @@
+﻿@model List<(int TaskId, string Question, string UserAnswer, string CorrectAnswer, bool IsCorrect)>
+
+@{
+    ViewData["Title"] = "Answer Results";
+    var lesson = ViewBag.Lesson as Finance_Literacy_App_Web.Models.Lesson;
+}
+
+<h1>Answer Results for @lesson.Title</h1>
+<p>Module: @lesson.Module.Title</p>
+
+@if (Model.Any())
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Question</th>
+                <th>Your Answer</th>
+                <th>Correct Answer</th>
+                <th>Result</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var result in Model)
+            {
+                <tr>
+                    <td>@result.Question</td>
+                    <td>@result.UserAnswer</td>
+                    <td>@result.CorrectAnswer</td>
+                    <td>
+                        @if (result.IsCorrect)
+                        {
+                            <span class="badge bg-success">Correct</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Incorrect</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No answers were submitted for this lesson.</p>
+}
+
+<a asp-controller="Home" asp-action="Index" class="btn btn-primary mt-3">Back to Home</a>
