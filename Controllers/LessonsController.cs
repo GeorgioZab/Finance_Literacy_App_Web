@@ -177,15 +177,6 @@ namespace Finance_Literacy_App_Web.Controllers
         {
             System.Diagnostics.Debug.WriteLine($"Create GET - LessonId: {moduleId}");
 
-            if (!moduleId.HasValue || moduleId <= 0)
-            {
-                ModelState.AddModelError("", "Не указан модуль для урока.");
-            }
-            else if (!_context.Lessons.Any(m => m.Id == moduleId))
-            {
-                ModelState.AddModelError("", "Выбранный модуль не существует.");
-            }
-
             ViewData["ModuleId"] = new SelectList(_context.Modules, "Id", "Title", moduleId);
             var lesson = new Lesson { ModuleId = moduleId ?? 0 };
             return View(lesson);
@@ -199,16 +190,11 @@ namespace Finance_Literacy_App_Web.Controllers
 
             ModelState.Remove("Module");
 
-            if (!_context.Lessons.Any(m => m.Id == lesson.ModuleId))
-            {
-                ModelState.AddModelError("ModuleId", "Выбранный модуль не существует.");
-            }
-
             if (ModelState.IsValid)
             {
                 _context.Add(lesson);
                 await _context.SaveChangesAsync();
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("ManageModules", "Admin");
             }
 
             var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
@@ -265,7 +251,7 @@ namespace Finance_Literacy_App_Web.Controllers
                     else
                         throw;
                 }
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("ManageModules", "Admin");
             }
 
             var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);

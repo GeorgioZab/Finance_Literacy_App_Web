@@ -58,7 +58,7 @@ namespace Finance_Literacy_App_Web.Controllers
             {
                 _context.Add(task);
                 await _context.SaveChangesAsync();
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("ManageModules", "Admin");
             }
 
             var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
@@ -115,7 +115,7 @@ namespace Finance_Literacy_App_Web.Controllers
                     else
                         throw;
                 }
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("ManageModules", "Admin");
             }
 
             var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
