@@ -79,7 +79,7 @@ namespace Finance_Literacy_App_Web.Controllers
             ViewData["AvailableLessons"] = availableLessons;
             ViewData["UserLessonStatuses"] = userLessonStatuses;
             ViewData["IsInGroup"] = user.GroupId.HasValue;
-            ViewData["GroupLessonDeadlines"] = groupLessonDeadlines; // Передаем дедлайны
+            ViewData["GroupLessonDeadlines"] = groupLessonDeadlines;
 
             if (!user.GroupId.HasValue)
             {

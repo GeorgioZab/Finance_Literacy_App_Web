@@ -4,6 +4,8 @@ using Finance_Literacy_App_Web.Data;
 using Finance_Literacy_App_Web.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
+using OfficeOpenXml;
+using ClosedXML.Excel;
 
 namespace Finance_Literacy_App_Web.Controllers
 {
@@ -154,24 +156,72 @@ namespace Finance_Literacy_App_Web.Controllers
         public async Task<IActionResult> ViewUserAnswers(int id)
         {
             var group = await _context.Groups
-                .Include(g => g.Users)
-                .FirstOrDefaultAsync(g => g.Id == id);
-            if (group == null)
-            {
-                return NotFound();
-            }
+        .Include(g => g.Users)
+        .FirstOrDefaultAsync(g => g.Id == id);
+            if (group == null) return NotFound();
 
-            var userIds = group.Users.Select(u => u.Id).ToList();
-            var userAnswers = await _context.UserTaskAnswers
-                .Include(uta => uta.User)
-                .Include(uta => uta.Task)
+            var answers = await _context.UserTaskAnswers
+                .Include(a => a.User)
+                .Include(a => a.Task)
                 .ThenInclude(t => t.Lesson)
                 .ThenInclude(l => l.Module)
-                .Where(uta => userIds.Contains(uta.UserId))
+                .Where(a => a.User.GroupId == id)
                 .ToListAsync();
 
             ViewBag.Group = group;
-            return View(userAnswers);
+            ViewBag.Lessons = await _context.Lessons
+                .Include(l => l.Module)
+                .ToListAsync();
+
+            return View(answers);
+        }
+
+        public async Task<IActionResult> ExportUserAnswersToExcel(int id)
+        {
+            var group = await _context.Groups
+                .Include(g => g.Users)
+                .FirstOrDefaultAsync(g => g.Id == id);
+            if (group == null) return NotFound();
+
+            var answers = await _context.UserTaskAnswers
+                .Include(a => a.User)
+                .Include(a => a.Task)
+                .ThenInclude(t => t.Lesson)
+                .ThenInclude(l => l.Module)
+                .Where(a => a.User.GroupId == id)
+                .ToListAsync();
+
+            using (var workbook = new XLWorkbook())
+            {
+                var worksheet = workbook.Worksheets.Add("UserAnswers");
+                worksheet.Cell(1, 1).Value = "User";
+                worksheet.Cell(1, 2).Value = "Lesson";
+                worksheet.Cell(1, 3).Value = "Task Question";
+                worksheet.Cell(1, 4).Value = "User Answer";
+                worksheet.Cell(1, 5).Value = "Correct Answer";
+                worksheet.Cell(1, 6).Value = "Result";
+                worksheet.Cell(1, 7).Value = "Submitted At";
+
+                for (int i = 0; i < answers.Count; i++)
+                {
+                    var answer = answers[i];
+                    var isCorrect = string.Compare(answer.Answer?.Trim(), answer.Task.CorrectAnswer?.Trim(), StringComparison.OrdinalIgnoreCase) == 0;
+                    worksheet.Cell(i + 2, 1).Value = answer.User.UserName;
+                    worksheet.Cell(i + 2, 2).Value = $"{answer.Task.Lesson.Title} (Module: {answer.Task.Lesson.Module.Title})";
+                    worksheet.Cell(i + 2, 3).Value = answer.Task.Question;
+                    worksheet.Cell(i + 2, 4).Value = answer.Answer;
+                    worksheet.Cell(i + 2, 5).Value = answer.Task.CorrectAnswer;
+                    worksheet.Cell(i + 2, 6).Value = isCorrect ? "Correct" : "Incorrect";
+                    worksheet.Cell(i + 2, 7).Value = answer.SubmittedAt.ToString("g");
+                }
+
+                using (var stream = new MemoryStream())
+                {
+                    workbook.SaveAs(stream);
+                    stream.Position = 0;
+                    return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"UserAnswers_{group.Name}_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx");
+                }
+            }
         }
     }
 }
