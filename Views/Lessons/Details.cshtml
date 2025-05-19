@@ -1,7 +1,7 @@
 ﻿@model Finance_Literacy_App_Web.Models.Lesson
 
 @{
-    ViewData["Title"] = "Lesson Details";
+    ViewData["Title"] = "Детали урока";
 }
 
 <h2>@Model.Title</h2>
@@ -16,5 +16,5 @@
             <input type="hidden" name="taskIds" value="@task.Id" />
         </div>
     }
-    <button type="submit" class="btn btn-primary">Submit Answers</button>
+    <button type="submit" class="btn btn-primary">Отправить ответы</button>
 </form>

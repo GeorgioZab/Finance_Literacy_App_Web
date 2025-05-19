@@ -1,16 +1,16 @@
 ﻿@model Finance_Literacy_App_Web.Models.User
 
 @{
-    ViewData["Title"] = "Remove User from Group";
+    ViewData["Title"] = "Удалить пользователя из группы";
 }
 
-<h1>Remove User from Group</h1>
-<h3>Are you sure you want to remove @Model.UserName from the group?</h3>
+<h1>Удалить пользователя из группы</h1>
+<h3>Вы уверены, что хотите удалить @Model.UserName из группы?</h3>
 <div>
     <form asp-action="RemoveUserFromGroup" method="post">
         <input type="hidden" name="id" value="@ViewBag.GroupId" />
         <input type="hidden" name="userId" value="@ViewBag.UserId" />
-        <button type="submit" class="btn btn-danger">Remove</button>
-        <a asp-action="Groups" asp-controller="Teacher" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-danger">Удалить</button>
+        <a asp-action="Groups" asp-controller="Teacher" class="btn btn-secondary">Отмена</a>
     </form>
 </div>

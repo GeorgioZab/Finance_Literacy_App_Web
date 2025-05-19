@@ -1,8 +1,8 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Главная страница";
 }
 
-<h1>Welcome to Finance Literacy App</h1>
+<h1>Добро пожаловать в приложение по финансовой грамотности</h1>
 
 @if (TempData["SuccessMessage"] != null)
 {
@@ -20,23 +20,23 @@
 
 @if (User.IsInRole("admin"))
 {
-    <h2>Admin Dashboard</h2>
+    <h2>Панель администратора</h2>
     <div class="row">
         <div class="col-md-4 mb-3">
             <div class="card dashboard-card">
                 <div class="card-body">
-                    <h5 class="card-title">Manage User</h5>
-                    <p class="card-text">View and edit user roles.</p>
-                    <a asp-controller="Admin" asp-action="ManageUser" class="btn btn-primary btn-sm">Go to Users</a>
+                    <h5 class="card-title">Управление пользователями</h5>
+                    <p class="card-text">Просмотр и редактирование ролей пользователей.</p>
+                    <a asp-controller="Admin" asp-action="ManageUser" class="btn btn-primary btn-sm">Перейти к пользователям</a>
                 </div>
             </div>
         </div>
         <div class="col-md-4 mb-3">
             <div class="card dashboard-card">
                 <div class="card-body">
-                    <h5 class="card-title">Manage Modules</h5>
-                    <p class="card-text">Create or modify lessons.</p>
-                    <a asp-controller="Admin" asp-action="ManageModules" class="btn btn-primary btn-sm">Go to Lessons</a>
+                    <h5 class="card-title">Управление модулями</h5>
+                    <p class="card-text">Создание и изменение уроков.</p>
+                    <a asp-controller="Admin" asp-action="ManageModules" class="btn btn-primary btn-sm">Перейти к урокам</a>
                 </div>
             </div>
         </div>
@@ -44,32 +44,32 @@
 }
 else if (User.IsInRole("teacher"))
 {
-    <h2>Teacher Dashboard</h2>
+    <h2>Панель преподавателя</h2>
     <div class="row">
         <div class="col-md-4 mb-3">
             <div class="card dashboard-card">
                 <div class="card-body">
-                    <h5 class="card-title">Assign Lessons</h5>
-                    <p class="card-text">Assign lessons to your groups.</p>
-                    <a asp-controller="Teacher" asp-action="AssignLesson" class="btn btn-primary btn-sm">Assign Now</a>
+                    <h5 class="card-title">Назначить уроки</h5>
+                    <p class="card-text">Назначьте уроки своим группам.</p>
+                    <a asp-controller="Teacher" asp-action="AssignLesson" class="btn btn-primary btn-sm">Назначить сейчас</a>
                 </div>
             </div>
         </div>
         <div class="col-md-4 mb-3">
             <div class="card dashboard-card">
                 <div class="card-body">
-                    <h5 class="card-title">Manage Groups</h5>
-                    <p class="card-text">View and manage your groups.</p>
-                    <a asp-controller="Teacher" asp-action="Groups" class="btn btn-primary btn-sm">Go to Groups</a>
+                    <h5 class="card-title">Управление группами</h5>
+                    <p class="card-text">Просмотр и управление вашими группами.</p>
+                    <a asp-controller="Teacher" asp-action="Groups" class="btn btn-primary btn-sm">Перейти к группам</a>
                 </div>
             </div>
         </div>
         <div class="col-md-4 mb-3">
             <div class="card dashboard-card">
                 <div class="card-body">
-                    <h5 class="card-title">Manage Deadlines</h5>
-                    <p class="card-text">View and manage lesson deadlines.</p>
-                    <a asp-controller="GroupLessonDeadlines" asp-action="Index" class="btn btn-primary btn-sm">View Deadlines</a>
+                    <h5 class="card-title">Управление сроками выполнения</h5>
+                    <p class="card-text">Просмотр и управление сроками выполнения уроков.</p>
+                    <a asp-controller="GroupLessonDeadlines" asp-action="Index" class="btn btn-primary btn-sm">Посмотреть сроки</a>
                 </div>
             </div>
         </div>
@@ -77,7 +77,7 @@ else if (User.IsInRole("teacher"))
 }
 else if (User.IsInRole("user"))
 {
-    <h2>Available Lessons</h2>
+    <h2>Доступные уроки</h2>
     @if (ViewData["AvailableLessons"] is List<Finance_Literacy_App_Web.Models.Lesson> lessons && lessons?.Any() == true)
     {
         <div class="row">
@@ -95,31 +95,31 @@ else if (User.IsInRole("user"))
                         <div class="card-body">
                             <h5 class="card-title">@lesson.Title</h5>
                             <p class="card-text">@lesson.Content</p>
-                            <p class="card-text"><strong>Status:</strong> @status</p>
+                            <p class="card-text"><strong>Статус:</strong> @(status == "NotStarted" ? "Не начато" : status == "Completed" ? "Завершено" : status)</p>
                             @if (isInGroup && deadline.HasValue)
                             {
-                                <p class="card-text"><strong>Deadline:</strong> @deadline.Value.ToString("dd MMMM yyyy, HH:mm")</p>
+                                <p class="card-text"><strong>Срок выполнения:</strong> @deadline.Value.ToString("dd MMMM yyyy, HH:mm")</p>
                                 @if (deadline.Value < DateTime.UtcNow)
                                 {
-                                    <span class="badge bg-danger">Overdue</span>
+                                    <span class="badge bg-danger">Просрочено</span>
                                 }
                             }
                             @if (status == "Completed")
                             {
-                                <span class="badge bg-success">Completed</span>
-                                <a asp-controller="Lessons" asp-action="AnswerResults" asp-route-lessonId="@lesson.Id" class="btn btn-sm btn-info mt-2">View Answers</a>
+                                <span class="badge bg-success">Завершено</span>
+                                <a asp-controller="Lessons" asp-action="AnswerResults" asp-route-lessonId="@lesson.Id" class="btn btn-sm btn-info mt-2">Посмотреть ответы</a>
                             }
                             else if (isInGroup) // Режим с учителем: все назначенные уроки открыты
                             {
-                                <a asp-controller="Lessons" asp-action="Details" asp-route-id="@lesson.Id" class="btn btn-primary btn-sm">Start Lesson</a>
+                                <a asp-controller="Lessons" asp-action="Details" asp-route-id="@lesson.Id" class="btn btn-primary btn-sm">Начать урок</a>
                             }
                             else if (firstIncompleteLessonId.HasValue && lesson.Id == firstIncompleteLessonId) // Самостоятельный режим
                             {
-                                <a asp-controller="Lessons" asp-action="Details" asp-route-id="@lesson.Id" class="btn btn-primary btn-sm">Start Lesson</a>
+                                <a asp-controller="Lessons" asp-action="Details" asp-route-id="@lesson.Id" class="btn btn-primary btn-sm">Начать урок</a>
                             }
                             else
                             {
-                                <span class="badge bg-secondary">Locked</span>
+                                <span class="badge bg-secondary">Заблокировано</span>
                             }
                         </div>
                     </div>
@@ -129,7 +129,7 @@ else if (User.IsInRole("user"))
     }
     else
     {
-        <p>No lessons available at the moment.</p>
+        <p>На данный момент уроки отсутствуют.</p>
     }
 }
 

@@ -1,10 +1,10 @@
 ﻿@model IEnumerable<Finance_Literacy_App_Web.Models.Group>
 
 @{
-    ViewData["Title"] = "My Groups";
+    ViewData["Title"] = "Мои группы";
 }
 
-<h1>My Groups</h1>
+<h1>Мои группы</h1>
 
 @if (TempData["ErrorMessage"] != null)
 {
@@ -14,16 +14,16 @@
 }
 
 <p>
-    <a asp-action="CreateGroup" class="btn btn-primary">Create New Group</a>
+    <a asp-action="CreateGroup" class="btn btn-primary">Создать новую группу</a>
 </p>
 
 <table class="table">
     <thead>
         <tr>
-            <th>Name</th>
-            <th>Invite Code</th>
-            <th>Users</th>
-            <th>Actions</th>
+            <th>Название</th>
+            <th>Код приглашения</th>
+            <th>Пользователи</th>
+            <th>Действия</th>
         </tr>
     </thead>
     <tbody>
@@ -31,7 +31,7 @@
         {
             <tr>
                 <td>@group.Name</td>
-                <td>@(group.InviteCode ?? "Not set")</td>
+                <td>@(group.InviteCode ?? "Не установлен")</td>
                 <td>
                     @if (group.Users.Any())
                     {
@@ -40,19 +40,19 @@
                             {
                                 <li>
                                     @user.UserName
-                                    <a asp-action="RemoveUserFromGroup" asp-route-id="@group.Id" asp-route-userId="@user.Id" class="btn btn-sm btn-danger">Remove</a>
+                                    <a asp-action="RemoveUserFromGroup" asp-route-id="@group.Id" asp-route-userId="@user.Id" class="btn btn-sm btn-danger">Удалить</a>
                                 </li>
                             }
                         </ul>
                     }
                     else
                     {
-                        <p>No users in this group.</p>
+                        <p>В этой группе нет пользователей.</p>
                     }
                 </td>
                 <td>
-                    <a asp-action="ViewUserAnswers" asp-route-id="@group.Id" class="btn btn-sm btn-info">View Answers</a>
-                    <a asp-action="DeleteGroup" asp-route-id="@group.Id" class="btn btn-sm btn-danger">Delete</a>
+                    <a asp-action="ViewUserAnswers" asp-route-id="@group.Id" class="btn btn-sm btn-info">Посмотреть ответы</a>
+                    <a asp-action="DeleteGroup" asp-route-id="@group.Id" class="btn btn-sm btn-danger">Удалить</a>
                 </td>
             </tr>
         }

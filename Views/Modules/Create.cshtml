@@ -1,17 +1,17 @@
 ﻿@model Finance_Literacy_App_Web.Models.Module
 
-<h1>Create New Module</h1>
+<h1>Создать новый модуль</h1>
 <form asp-action="Create" method="post">
     <div class="form-group mb-3">
-        <label asp-for="Title" class="form-label"></label>
+        <label asp-for="Title" class="form-label">Название</label>
         <input asp-for="Title" class="form-control" />
         <span asp-validation-for="Title" class="text-danger"></span>
     </div>
     <div class="form-group mb-3">
-        <label asp-for="Description" class="form-label"></label>
+        <label asp-for="Description" class="form-label">Описание</label>
         <input asp-for="Description" class="form-control" />
         <span asp-validation-for="Description" class="text-danger"></span>
     </div>
-    <button type="submit" class="btn btn-primary">Create</button>
-    <a asp-action="Index" asp-controller="Home" class="btn btn-secondary">Back</a>
+    <button type="submit" class="btn btn-primary">Создать</button>
+    <a asp-action="Index" asp-controller="Home" class="btn btn-secondary">Назад</a>
 </form>

@@ -1,10 +1,10 @@
 ﻿@model List<Finance_Literacy_App_Web.Models.GroupLessonDeadline>
 
 @{
-    ViewData["Title"] = "Group Lesson Deadlines";
+    ViewData["Title"] = "Сроки выполнения уроков для групп";
 }
 
-<h1>Group Lesson Deadlines</h1>
+<h1>Сроки выполнения уроков для групп</h1>
 
 @if (TempData["ErrorMessage"] != null)
 {
@@ -13,14 +13,14 @@
     </div>
 }
 
-<a asp-action="Create" asp-controller="GroupLessonDeadlines" class="btn btn-primary mb-3">Create New Deadline</a>
+<a asp-action="Create" asp-controller="GroupLessonDeadlines" class="btn btn-primary mb-3">Создать новый срок выполнения</a>
 <table class="table table-striped">
     <thead>
         <tr>
-            <th>Group</th>
-            <th>Lesson</th>
-            <th>Deadline</th>
-            <th>Actions</th>
+            <th>Группа</th>
+            <th>Урок</th>
+            <th>Срок выполнения</th>
+            <th>Действия</th>
         </tr>
     </thead>
     <tbody>
@@ -31,12 +31,12 @@
                 <td>@item.Lesson?.Title</td>
                 <td>@item.Deadline.ToString("g")</td>
                 <td>
-                    <span style="display:none;">Debug: GroupId = @item.GroupId, LessonId = @item.LessonId</span>
-                    <a asp-action="Edit" asp-controller="GroupLessonDeadlines" asp-route-groupId="@item.GroupId" asp-route-lessonId="@item.LessonId" class="btn btn-sm btn-warning">Edit</a>
-                    <a asp-action="Delete" asp-controller="GroupLessonDeadlines" asp-route-groupId="@item.GroupId" asp-route-lessonId="@item.LessonId" class="btn btn-sm btn-danger">Delete</a>
+                    <span style="display:none;">Отладка: GroupId = @item.GroupId, LessonId = @item.LessonId</span>
+                    <a asp-action="Edit" asp-controller="GroupLessonDeadlines" asp-route-groupId="@item.GroupId" asp-route-lessonId="@item.LessonId" class="btn btn-sm btn-warning">Редактировать</a>
+                    <a asp-action="Delete" asp-controller="GroupLessonDeadlines" asp-route-groupId="@item.GroupId" asp-route-lessonId="@item.LessonId" class="btn btn-sm btn-danger">Удалить</a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
-<a asp-action="Groups" asp-controller="Teacher" class="btn btn-secondary">Back to Groups</a>
+<a asp-action="Groups" asp-controller="Teacher" class="btn btn-secondary">Вернуться к группам</a>

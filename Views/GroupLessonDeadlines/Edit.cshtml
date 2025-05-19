@@ -1,35 +1,35 @@
 ﻿@model Finance_Literacy_App_Web.Models.GroupLessonDeadline
 
 @{
-    ViewData["Title"] = "Edit Group Lesson Deadline";
+    ViewData["Title"] = "Редактировать срок выполнения урока для группы";
 }
 
-<h1>Edit Group Lesson Deadline</h1>
+<h1>Редактировать срок выполнения урока для группы</h1>
 <form asp-action="Edit" method="post">
     <input type="hidden" asp-for="GroupId" />
     <input type="hidden" asp-for="LessonId" />
     <div class="form-group mb-3">
-        <label asp-for="GroupId" class="form-label">Group</label>
+        <label asp-for="GroupId" class="form-label">Группа</label>
         <select asp-items="ViewBag.Groups" asp-for="GroupId" class="form-control" disabled>
-            <option value="">Select a group</option>
+            <option value="">Выберите группу</option>
         </select>
         <span asp-validation-for="GroupId" class="text-danger"></span>
     </div>
     <div class="form-group mb-3">
-        <label asp-for="LessonId" class="form-label">Lesson</label>
+        <label asp-for="LessonId" class="form-label">Урок</label>
         <select asp-items="ViewBag.Lessons" asp-for="LessonId" class="form-control" disabled>
-            <option value="">Select a lesson</option>
+            <option value="">Выберите урок</option>
         </select>
         <span asp-validation-for="LessonId" class="text-danger"></span>
     </div>
     <div class="form-group mb-3">
-        <label asp-for="Deadline" class="form-label">Deadline</label>
+        <label asp-for="Deadline" class="form-label">Срок выполнения</label>
         <input asp-for="Deadline" type="datetime-local" class="form-control" required />
         <span asp-validation-for="Deadline" class="text-danger"></span>
     </div>
     <div asp-validation-summary="All" class="text-danger"></div>
-    <button type="submit" class="btn btn-primary">Save</button>
-    <a asp-action="Index" asp-controller="GroupLessonDeadlines" class="btn btn-secondary">Back</a>
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+    <a asp-action="Index" asp-controller="GroupLessonDeadlines" class="btn btn-secondary">Вернуться</a>
 </form>
 
 @section Scripts {

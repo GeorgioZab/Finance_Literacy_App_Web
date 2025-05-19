@@ -1,19 +1,19 @@
 ﻿@model Finance_Literacy_App_Web.Models.Group
 
 @{
-    ViewData["Title"] = "Join Group";
+    ViewData["Title"] = "Присоединиться к группе";
 }
 
-<h1>Join a Group</h1>
+<h1>Присоединиться к группе</h1>
 
 <form asp-action="JoinGroup" method="post">
     <div class="form-group mb-3">
-        <label for="inviteCode" class="form-label">Invite Code</label>
+        <label for="inviteCode" class="form-label">Код приглашения</label>
         <input type="text" name="inviteCode" class="form-control" value="@Model" required />
         <span asp-validation-for="InviteCode" class="text-danger"></span>
     </div>
-    <button type="submit" class="btn btn-primary">Join</button>
-    <a asp-action="Index" asp-controller="Home" class="btn btn-secondary">Cancel</a>
+    <button type="submit" class="btn btn-primary">Присоединиться</button>
+    <a asp-action="Index" asp-controller="Home" class="btn btn-secondary">Отмена</a>
 </form>
 
 @if (!ViewData.ModelState.IsValid)

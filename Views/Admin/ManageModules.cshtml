@@ -1,13 +1,13 @@
 ﻿@model IEnumerable<Finance_Literacy_App_Web.Models.Module>
 
 @{
-    ViewData["Title"] = "Manage Modules";
+    ViewData["Title"] = "Управление модулями";
 }
 
 <h2>@ViewData["Title"]</h2>
 
 <p>
-    <a asp-controller="Modules" asp-action="Create" class="btn btn-primary">Create New Module</a>
+    <a asp-controller="Modules" asp-action="Create" class="btn btn-primary">Создать новый модуль</a>
 </p>
 
 @foreach (var module in Model)
@@ -15,42 +15,42 @@
     <div class="card mb-3">
         <div class="card-header">
             <h5>@module.Title</h5>
-            <a asp-controller="Lessons" asp-action="Create" asp-route-moduleId="@module.Id" class="btn btn-sm btn-success">Create Lesson</a>
-            <a asp-controller="Modules" asp-action="Edit" asp-route-id="@module.Id" class="btn btn-sm btn-primary">Edit Module</a>
-            <a asp-controller="Modules" asp-action="Delete" asp-route-id="@module.Id" class="btn btn-sm btn-danger">Delete Module</a>
+            <a asp-controller="Lessons" asp-action="Create" asp-route-moduleId="@module.Id" class="btn btn-sm btn-success">Создать урок</a>
+            <a asp-controller="Modules" asp-action="Edit" asp-route-id="@module.Id" class="btn btn-sm btn-primary">Редактировать модуль</a>
+            <a asp-controller="Modules" asp-action="Delete" asp-route-id="@module.Id" class="btn btn-sm btn-danger">Удалить модуль</a>
         </div>
         <div class="card-body">
             @if (module.Lessons != null && module.Lessons.Any())
             {
-                <h6>Lessons:</h6>
+                <h6>Уроки:</h6>
                 <ul>
                     @foreach (var lesson in module.Lessons)
                     {
                         <li>
                             @lesson.Title
-                            <a asp-controller="Lessons" asp-action="Edit" asp-route-id="@lesson.Id" class="btn btn-sm btn-primary">Edit</a>
-                            <a asp-controller="Lessons" asp-action="Delete" asp-route-id="@lesson.Id" class="btn btn-sm btn-danger">Delete</a>
+                            <a asp-controller="Lessons" asp-action="Edit" asp-route-id="@lesson.Id" class="btn btn-sm btn-primary">Редактировать</a>
+                            <a asp-controller="Lessons" asp-action="Delete" asp-route-id="@lesson.Id" class="btn btn-sm btn-danger">Удалить</a>
                             @if (lesson.Tasks != null && lesson.Tasks.Any())
                             {
                                 <ul>
                                     @foreach (var task in lesson.Tasks)
                                     {
                                         <li>
-                                            @task.Question (Answer: @task.CorrectAnswer)
-                                            <a asp-controller="Tasks" asp-action="Edit" asp-route-id="@task.Id" class="btn btn-sm btn-primary">Edit Task</a>
-                                            <a asp-controller="Tasks" asp-action="Delete" asp-route-id="@task.Id" class="btn btn-sm btn-danger">Delete Task</a>
+                                            @task.Question (Ответ: @task.CorrectAnswer)
+                                            <a asp-controller="Tasks" asp-action="Edit" asp-route-id="@task.Id" class="btn btn-sm btn-primary">Редактировать задание</a>
+                                            <a asp-controller="Tasks" asp-action="Delete" asp-route-id="@task.Id" class="btn btn-sm btn-danger">Удалить задание</a>
                                         </li>
                                     }
                                 </ul>
                             }
-                            <a asp-controller="Tasks" asp-action="Create" asp-route-lessonId="@lesson.Id" class="btn btn-sm btn-success">Create Task</a>
+                            <a asp-controller="Tasks" asp-action="Create" asp-route-lessonId="@lesson.Id" class="btn btn-sm btn-success">Создать задание</a>
                         </li>
                     }
                 </ul>
             }
             else
             {
-                <p>No lessons available for this module.</p>
+                <p>Для этого модуля нет доступных уроков.</p>
             }
         </div>
     </div>

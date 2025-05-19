@@ -1,19 +1,19 @@
 ﻿@model List<Finance_Literacy_App_Web.Models.UserTaskAnswer>
 
 @{
-    ViewData["Title"] = "User Answers";
+    ViewData["Title"] = "Ответы пользователей";
     var group = ViewBag.Group as Finance_Literacy_App_Web.Models.Group;
     var lessons = ViewBag.Lessons as List<Finance_Literacy_App_Web.Models.Lesson> ?? new List<Finance_Literacy_App_Web.Models.Lesson>();
     string sortOrder = ViewBag.SortOrder as string ?? "asc"; // По умолчанию A-Z
 }
 
-<h1>User Answers for Group: @group.Name</h1>
+<h1>Ответы пользователей для группы: @group.Name</h1>
 
 <!-- Фильтрация по урокам -->
 <div class="row g-2 mb-3">
     <div class="col-auto">
         <select id="lessonFilter" class="form-select" onchange="filterTable()">
-            <option value="">All Lessons</option>
+            <option value="">Все уроки</option>
             @foreach (var lesson in lessons)
             {
                 <option value="@lesson.Id">@lesson.Title</option>
@@ -25,7 +25,7 @@
 <!-- Сортировка по пользователям -->
 <div class="mb-3">
     <button id="sortButton" class="btn btn-primary" onclick="sortTable()">
-        Sort by User (@(sortOrder == "asc" ? "A-Z" : "Z-A"))
+        Сортировать по пользователям (@(sortOrder == "asc" ? "А-Я" : "Я-А"))
     </button>
 </div>
 
@@ -34,13 +34,13 @@
     <table class="table table-bordered" id="answersTable">
         <thead>
             <tr>
-                <th>User</th>
-                <th>Lesson</th>
-                <th>Task Question</th>
-                <th>User Answer</th>
-                <th>Correct Answer</th>
-                <th>Result</th>
-                <th>Submitted At</th>
+                <th>Пользователь</th>
+                <th>Урок</th>
+                <th>Вопрос задания</th>
+                <th>Ответ пользователя</th>
+                <th>Правильный ответ</th>
+                <th>Результат</th>
+                <th>Дата отправки</th>
             </tr>
         </thead>
         <tbody>
@@ -48,18 +48,18 @@
             {
                 <tr data-lesson-id="@answer.Task.LessonId">
                     <td>@answer.User.UserName</td>
-                    <td>@answer.Task.Lesson.Title (Module: @answer.Task.Lesson.Module.Title)</td>
+                    <td>@answer.Task.Lesson.Title (Модуль: @answer.Task.Lesson.Module.Title)</td>
                     <td>@answer.Task.Question</td>
                     <td>@answer.Answer</td>
                     <td>@answer.Task.CorrectAnswer</td>
                     <td>
                         @if (string.Compare(answer.Answer?.Trim(), answer.Task.CorrectAnswer?.Trim(), StringComparison.OrdinalIgnoreCase) == 0)
                         {
-                            <span class="badge bg-success">Correct</span>
+                            <span class="badge bg-success">Правильно</span>
                         }
                         else
                         {
-                            <span class="badge bg-danger">Incorrect</span>
+                            <span class="badge bg-danger">Неправильно</span>
                         }
                     </td>
                     <td>@answer.SubmittedAt.ToString("g")</td>
@@ -69,14 +69,14 @@
     </table>
 
     <!-- Кнопка для экспорта в Excel -->
-    <a asp-action="ExportUserAnswersToExcel" asp-route-id="@group.Id" class="btn btn-success mb-3">Export to Excel</a>
+    <a asp-action="ExportUserAnswersToExcel" asp-route-id="@group.Id" class="btn btn-success mb-3">Экспортировать в Excel</a>
 }
 else
 {
-    <p>No answers have been submitted by users in this group.</p>
+    <p>Пользователи этой группы не отправили ни одного ответа.</p>
 }
 
-<a asp-action="Groups" class="btn btn-secondary mt-3">Back to Groups</a>
+<a asp-action="Groups" class="btn btn-secondary mt-3">Вернуться к группам</a>
 
 <script>
     let currentSortOrder = '@sortOrder';
@@ -114,7 +114,7 @@ else
         }
         rows.forEach(row => tbody.appendChild(row));
 
-        document.getElementById('sortButton').textContent = 'Sort by User (' + (currentSortOrder === 'asc' ? 'A-Z' : 'Z-A') + ')';
+        document.getElementById('sortButton').textContent = 'Сортировать по пользователям (' + (currentSortOrder === 'asc' ? 'А-Я' : 'Я-А') + ')';
     }
 
     window.onload = filterTable;

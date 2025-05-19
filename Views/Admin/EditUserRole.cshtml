@@ -1,15 +1,15 @@
 ﻿@model Finance_Literacy_App_Web.Models.User
 
 @{
-    ViewData["Title"] = "Edit User Role";
+    ViewData["Title"] = "Изменить роль пользователя";
 }
 
-<h1>Edit Role for @Model.UserName</h1>
+<h1>Изменить роль для @Model.UserName</h1>
 
 <form asp-action="EditUserRole" method="post">
     <input type="hidden" asp-for="Id" />
     <div class="form-group mb-3">
-        <label for="role" class="form-label">Role</label>
+        <label for="role" class="form-label">Роль</label>
         <select name="role" class="form-control" required>
             @foreach (var role in ViewData["Roles"] as List<string>)
             {
@@ -17,6 +17,6 @@
             }
         </select>
     </div>
-    <button type="submit" class="btn btn-primary">Save</button>
-    <a asp-action="ManageUser" class="btn btn-secondary">Cancel</a>
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+    <a asp-action="ManageUser" class="btn btn-secondary">Отмена</a>
 </form>

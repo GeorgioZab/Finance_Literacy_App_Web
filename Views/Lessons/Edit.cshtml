@@ -15,11 +15,11 @@
         <span asp-validation-for="Content" class="text-danger"></span>
     </div>
     <div class="form-group mb-3">
-        <label asp-for="ModuleId" class="form-label">Module</label>
+        <label asp-for="ModuleId" class="form-label">Модуль</label>
         <select asp-for="ModuleId" class="form-control" asp-items="ViewBag.ModuleId" disabled></select>
         <span asp-validation-for="ModuleId" class="text-danger"></span>
     </div>
     <div asp-validation-summary="All" class="text-danger"></div>
-    <button type="submit" class="btn btn-primary">Save</button>
-    <a asp-action="Index" asp-controller="Home" class="btn btn-secondary">Back</a>
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+    <a asp-action="Index" asp-controller="Home" class="btn btn-secondary">Назад</a>
 </form>
