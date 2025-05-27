@@ -14,6 +14,11 @@
         <span asp-validation-for="Content" class="text-danger"></span>
     </div>
     <div class="form-group mb-3">
+        <label asp-for="YouTubeVideoUrl" class="form-label">Ссылка на YouTube-видео</label>
+        <input asp-for="YouTubeVideoUrl" class="form-control" placeholder="Например: https://www.youtube.com/watch?v=abc123" />
+        <span asp-validation-for="YouTubeVideoUrl" class="text-danger"></span>
+    </div>
+    <div class="form-group mb-3">
         <label asp-for="ModuleId" class="form-label">Модуль</label>
         <select asp-for="ModuleId" class="form-control" asp-items="ViewBag.ModuleId" disabled></select>
         <span asp-validation-for="ModuleId" class="text-danger"></span>

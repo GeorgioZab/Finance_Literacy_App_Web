@@ -2,11 +2,42 @@
 
 @{
     ViewData["Title"] = "Детали урока";
+
+    // Преобразуем ссылку YouTube в формат для встраивания
+    string embedUrl = "";
+    if (!string.IsNullOrEmpty(Model.YouTubeVideoUrl))
+    {
+        string videoId = "";
+        if (Model.YouTubeVideoUrl.Contains("youtu.be"))
+        {
+            videoId = Model.YouTubeVideoUrl.Split('/').Last().Split('?').First();
+        }
+        else if (Model.YouTubeVideoUrl.Contains("youtube.com"))
+        {
+            videoId = Model.YouTubeVideoUrl.Split("v=").Last().Split('&').First();
+        }
+        embedUrl = $"https://www.youtube.com/embed/{videoId}";
+    }
 }
 
 <h2>@Model.Title</h2>
 <p>Модуль: @Model.Module.Title</p>
 
+@if (!string.IsNullOrEmpty(embedUrl))
+{
+    <div class="mb-4">
+        <h3>Видео к уроку</h3>
+        <div class="embed-responsive embed-responsive-16by9">
+            <iframe class="embed-responsive-item" src="@embedUrl" allowfullscreen></iframe>
+        </div>
+    </div>
+}
+else
+{
+    <p class="text-warning">Видео для этого урока отсутствует.</p>
+}
+
+<h3>Задания</h3>
 <form asp-action="SubmitAnswer" method="post">
     @foreach (var task in Model.Tasks)
     {
@@ -18,3 +49,29 @@
     }
     <button type="submit" class="btn btn-primary">Отправить ответы</button>
 </form>
+
+<style>
+    .embed-responsive {
+        position: relative;
+        display: block;
+        width: 100%;
+        padding: 0;
+        overflow: hidden;
+    }
+
+    .embed-responsive-16by9::before {
+        display: block;
+        content: "";
+        padding-top: 56.25%; /* Соотношение сторон 16:9 */
+    }
+
+    .embed-responsive-item {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: 0;
+    }
+</style>

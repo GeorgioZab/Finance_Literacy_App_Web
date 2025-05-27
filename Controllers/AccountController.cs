@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Finance_Literacy_App_Web.Data;
+using DocumentFormat.OpenXml.InkML;
 
 namespace Finance_Literacy_App_Web.Controllers
 {
@@ -13,11 +15,31 @@ namespace Finance_Literacy_App_Web.Controllers
     {
         private readonly AuthService _authService;
         private readonly ILogger<AccountController> _logger;
+        private readonly Data.Context _context;
 
-        public AccountController(AuthService authService, ILogger<AccountController> logger)
+        public AccountController(AuthService authService, ILogger<AccountController> logger, Data.Context context)
         {
             _authService = authService ?? throw new ArgumentNullException(nameof(authService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _context = context ?? throw new ArgumentNullException(nameof(context));
+        }
+
+        // GET: Account/MyGroup
+        [Authorize(Roles = "user")]
+        public async Task<IActionResult> MyGroup()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var user = await _context.Users
+                .Include(u => u.Group)
+                .ThenInclude(g => g.Users)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+            {
+                return NotFound("Пользователь не найден.");
+            }
+
+            return View(user);
         }
 
         // GET: Account/JoinGroup

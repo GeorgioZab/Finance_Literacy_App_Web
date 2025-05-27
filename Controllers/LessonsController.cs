@@ -47,21 +47,33 @@ namespace Finance_Literacy_App_Web.Controllers
                 return NotFound();
             }
 
+            var userLessonStatus = await _context.UserLessonStatuses
+                .FirstOrDefaultAsync(uls => uls.UserId == userId && uls.LessonId == id);
+
             bool isLessonAvailable = false;
-            if (!user.GroupId.HasValue)
+            if (userLessonStatus?.Status == "Completed") // Завершенный урок всегда доступен
+            {
+                isLessonAvailable = true;
+            }
+            else if (!user.GroupId.HasValue) // Пользователь без группы
             {
                 var completedLessonIds = await _context.UserLessonStatuses
                     .Where(uls => uls.UserId == userId && uls.Status == "Completed")
                     .Select(uls => uls.LessonId)
                     .ToListAsync();
 
-                var nextLesson = await _context.Lessons
+                var lessonsInModule = await _context.Lessons
+                    .Where(l => l.ModuleId == lesson.ModuleId)
                     .OrderBy(l => l.Id)
-                    .FirstOrDefaultAsync(l => !completedLessonIds.Contains(l.Id));
+                    .ToListAsync();
+                var nextLessonIndex = lessonsInModule.FindIndex(l => l.Id == id);
+                var completedInModule = lessonsInModule
+                    .Take(nextLessonIndex)
+                    .All(l => completedLessonIds.Contains(l.Id));
 
-                isLessonAvailable = nextLesson != null && nextLesson.Id == id;
+                isLessonAvailable = nextLessonIndex == 0 || completedInModule; // Доступен, если это первый урок или все предыдущие в модуле пройдены
             }
-            else
+            else // Пользователь в группе
             {
                 var assignedLessonIds = await _context.GroupLessonDeadlines
                     .Where(gld => gld.GroupId == user.GroupId && gld.Deadline >= DateTime.Now.ToUniversalTime())
@@ -73,7 +85,7 @@ namespace Finance_Literacy_App_Web.Controllers
 
             if (!isLessonAvailable)
             {
-                return RedirectToAction("Index", "Home", new { error = "Lesson not available." });
+                return RedirectToAction("Index", "Home", new { error = "Урок недоступен." });
             }
 
             _logger.LogInformation("Accessing Lessons/Details for user {UserName}. IsAuthenticated: {IsAuthenticated}.",
@@ -173,20 +185,28 @@ namespace Finance_Literacy_App_Web.Controllers
         }
 
         // GET: Lessons/Create
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Create(int? moduleId)
         {
-            System.Diagnostics.Debug.WriteLine($"Create GET - LessonId: {moduleId}");
+            System.Diagnostics.Debug.WriteLine($"Create GET - ModuleId: {moduleId}");
+
+            if (moduleId == null)
+            {
+                return BadRequest("ModuleId is required.");
+            }
 
             ViewData["ModuleId"] = new SelectList(_context.Modules, "Id", "Title", moduleId);
-            var lesson = new Lesson { ModuleId = moduleId ?? 0 };
+            var lesson = new Lesson { ModuleId = moduleId.Value };
             return View(lesson);
         }
 
+        // POST: Lessons/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Lesson lesson, string[] taskQuestions, string[] taskAnswers)
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> Create(Lesson lesson)
         {
-            System.Diagnostics.Debug.WriteLine($"Create POST - LessonId: {lesson.ModuleId}");
+            System.Diagnostics.Debug.WriteLine($"Create POST - ModuleId: {lesson.ModuleId}");
 
             ModelState.Remove("Module");
 
@@ -208,6 +228,7 @@ namespace Finance_Literacy_App_Web.Controllers
         }
 
         // GET: Lessons/Edit/5
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -217,13 +238,15 @@ namespace Finance_Literacy_App_Web.Controllers
             if (lesson == null)
                 return NotFound();
 
-            ViewData["LessonId"] = new SelectList(_context.Modules, "Id", "Title", lesson.ModuleId);
+            ViewData["ModuleId"] = new SelectList(_context.Modules, "Id", "Title", lesson.ModuleId);
             return View(lesson);
         }
 
+        // POST: Lessons/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Lesson lesson, string[] taskQuestions, string[] taskAnswers)
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> Edit(int id, Lesson lesson)
         {
             System.Diagnostics.Debug.WriteLine($"Edit POST - ModuleId: {lesson.ModuleId}");
 
@@ -232,7 +255,7 @@ namespace Finance_Literacy_App_Web.Controllers
 
             ModelState.Remove("Module");
 
-            if (!_context.Lessons.Any(m => m.Id == lesson.ModuleId))
+            if (!_context.Modules.Any(m => m.Id == lesson.ModuleId))
             {
                 ModelState.AddModelError("ModuleId", "Выбранный модуль не существует.");
             }
@@ -246,7 +269,7 @@ namespace Finance_Literacy_App_Web.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!_context.Tasks.Any(e => e.Id == lesson.Id))
+                    if (!_context.Lessons.Any(e => e.Id == lesson.Id))
                         return NotFound();
                     else
                         throw;
@@ -265,6 +288,7 @@ namespace Finance_Literacy_App_Web.Controllers
         }
 
         // GET: Lessons/Delete/5
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -281,11 +305,13 @@ namespace Finance_Literacy_App_Web.Controllers
                 return NotFound();
             }
 
-            return View("~/Views/Lessons/Delete.cshtml", lesson);
+            return View(lesson);
         }
 
+        // POST: Lessons/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var lesson = await _context.Lessons.FindAsync(id);

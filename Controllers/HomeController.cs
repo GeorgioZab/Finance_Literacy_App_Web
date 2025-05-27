@@ -5,6 +5,7 @@ using Finance_Literacy_App_Web.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using Finance_Literacy_App_Web.Models;
+using System.Security.Claims;
 
 namespace Finance_Literacy_App_Web.Controllers
 {
@@ -22,77 +23,116 @@ namespace Finance_Literacy_App_Web.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            var user = await _context.Users.FindAsync(userId);
-
-            System.Diagnostics.Debug.WriteLine($"Index - User GroupId: {user.GroupId}");
-
-            var lessons = await _context.Lessons
-                .Include(l => l.Module)
-                .Include(l => l.Tasks)
-                .OrderBy(l => l.Id)
-                .ToListAsync();
-
-            var userLessonStatuses = await _context.UserLessonStatuses
-                .Where(uls => uls.UserId == userId)
-                .ToListAsync();
-
-            System.Diagnostics.Debug.WriteLine($"Index - Loaded UserLessonStatuses for UserId {userId}:");
-            foreach (var uls in userLessonStatuses)
+            if (User.Identity.IsAuthenticated)
             {
-                System.Diagnostics.Debug.WriteLine($"LessonId={uls.LessonId}, Status={uls.Status}, CompletedAt={uls.CompletedAt}");
-            }
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var user = await _context.Users
+                    .Include(u => u.Group)
+                    .FirstOrDefaultAsync(u => u.Id == userId);
 
-            var groupLessonDeadlines = user.GroupId.HasValue
-                ? await _context.GroupLessonDeadlines
-                    .Where(gld => gld.GroupId == user.GroupId)
-                    .ToListAsync()
-                : new List<GroupLessonDeadline>();
+                if (User.IsInRole("user"))
+                {
+                    var lessons = new List<Lesson>();
+                    var userLessonStatuses = await _context.UserLessonStatuses
+                        .Where(uls => uls.UserId == userId)
+                        .ToListAsync();
 
-            System.Diagnostics.Debug.WriteLine($"Index - Loaded GroupLessonDeadlines for GroupId {user.GroupId}:");
-            foreach (var gld in groupLessonDeadlines)
-            {
-                System.Diagnostics.Debug.WriteLine($"LessonId={gld.LessonId}, GroupId={gld.GroupId}, Deadline={gld.Deadline}");
-            }
+                    if (user?.GroupId.HasValue == true) // Пользователь в группе
+                    {
+                        var assignedLessonIds = await _context.GroupLessonDeadlines
+                            .Where(gld => gld.GroupId == user.GroupId)
+                            .Select(gld => gld.LessonId)
+                            .ToListAsync();
 
-            var availableLessons = new List<Finance_Literacy_App_Web.Models.Lesson>();
-            if (!user.GroupId.HasValue) // Самостоятельное обучение
-            {
-                availableLessons = lessons;
-            }
-            else // Обучение с учителем
-            {
-                var assignedLessonIds = groupLessonDeadlines
-                    .Where(gld => gld.GroupId == user.GroupId)
-                    .Select(gld => gld.LessonId)
-                    .ToList();
+                        lessons = await _context.Lessons
+                            .Include(l => l.Module)
+                            .Where(l => assignedLessonIds.Contains(l.Id))
+                            .OrderBy(l => l.ModuleId)
+                            .ThenBy(l => l.Id)
+                            .ToListAsync();
+                    }
+                    else // Пользователь без группы
+                    {
+                        lessons = await _context.Lessons
+                            .Include(l => l.Module)
+                            .OrderBy(l => l.ModuleId)
+                            .ThenBy(l => l.Id)
+                            .ToListAsync();
+                    }
 
-                System.Diagnostics.Debug.WriteLine($"Index - Assigned Lesson IDs: {string.Join(", ", assignedLessonIds)}");
+                    // Определяем первый незавершенный урок внутри каждого модуля
+                    var groupedLessons = lessons.GroupBy(l => l.ModuleId);
+                    var firstIncompleteLesson = null as Lesson;
+                    foreach (var group in groupedLessons)
+                    {
+                        var incomplete = group
+                            .OrderBy(l => l.Id)
+                            .FirstOrDefault(l => !userLessonStatuses.Any(uls => uls.LessonId == l.Id && uls.Status == "Completed"));
+                        if (incomplete != null)
+                        {
+                            firstIncompleteLesson = incomplete;
+                            break;
+                        }
+                    }
 
-                availableLessons = lessons
-                    .Where(l => assignedLessonIds.Contains(l.Id))
-                    .ToList();
-            }
+                    var groupLessonDeadlines = user?.GroupId.HasValue == true
+                        ? await _context.GroupLessonDeadlines
+                            .Where(gld => gld.GroupId == user.GroupId)
+                            .ToListAsync()
+                        : new List<GroupLessonDeadline>();
 
-            System.Diagnostics.Debug.WriteLine($"Index - Available Lessons Count: {availableLessons.Count}");
+                    ViewData["AvailableLessons"] = lessons;
+                    ViewData["UserLessonStatuses"] = userLessonStatuses;
+                    ViewData["FirstIncompleteLessonId"] = firstIncompleteLesson?.Id;
+                    ViewData["IsInGroup"] = user?.GroupId.HasValue == true;
+                    ViewData["GroupLessonDeadlines"] = groupLessonDeadlines;
+                    ViewData["UserGroupName"] = user?.Group?.Name;
+                }
+                else if (User.IsInRole("admin"))
+                {
+                    // Для админа загружаем все уроки, модули и группы
+                    var lessons = await _context.Lessons
+                        .Include(l => l.Module)
+                        .OrderBy(l => l.ModuleId)
+                        .ThenBy(l => l.Id)
+                        .ToListAsync();
 
-            ViewData["AvailableLessons"] = availableLessons;
-            ViewData["UserLessonStatuses"] = userLessonStatuses;
-            ViewData["IsInGroup"] = user.GroupId.HasValue;
-            ViewData["GroupLessonDeadlines"] = groupLessonDeadlines;
+                    var modules = await _context.Modules
+                        .OrderBy(m => m.Id)
+                        .ToListAsync();
 
-            if (!user.GroupId.HasValue)
-            {
-                var completedLessonIds = userLessonStatuses
-                    .Where(uls => uls.Status == "Completed")
-                    .Select(uls => uls.LessonId)
-                    .ToList();
+                    var groups = await _context.Groups
+                        .Include(g => g.Users)
+                        .OrderBy(g => g.Name)
+                        .ToListAsync();
 
-                var firstIncompleteLesson = lessons
-                    .OrderBy(l => l.Id)
-                    .FirstOrDefault(l => !completedLessonIds.Contains(l.Id));
+                    ViewData["Lessons"] = lessons;
+                    ViewData["Modules"] = modules;
+                    ViewData["Groups"] = groups;
+                }
+                else if (User.IsInRole("teacher"))
+                {
+                    // Для учителя загружаем группы, которые он ведет, и уроки
+                    var teacherGroups = await _context.Groups
+                        .Include(g => g.Users)
+                        .OrderBy(g => g.Name)
+                        .ToListAsync();
 
-                ViewData["FirstIncompleteLessonId"] = firstIncompleteLesson?.Id;
+                    var lessons = await _context.Lessons
+                        .Include(l => l.Module)
+                        .OrderBy(l => l.ModuleId)
+                        .ThenBy(l => l.Id)
+                        .ToListAsync();
+
+                    var groupLessonDeadlines = await _context.GroupLessonDeadlines
+                        .Include(gld => gld.Group)
+                        .Include(gld => gld.Lesson)
+                        .ToListAsync();
+
+                    ViewData["TeacherGroups"] = teacherGroups;
+                    ViewData["Lessons"] = lessons;
+                    ViewData["GroupLessonDeadlines"] = groupLessonDeadlines;
+                }
             }
 
             return View();

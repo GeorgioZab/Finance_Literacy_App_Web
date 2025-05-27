@@ -1,0 +1,38 @@
+﻿@model Finance_Literacy_App_Web.Models.User
+
+@{
+    ViewData["Title"] = "Моя группа";
+}
+
+<h1>Моя группа</h1>
+
+@if (Model.Group != null)
+{
+    <div class="card mb-3">
+        <div class="card-header">
+            <h5>Название группы: @Model.Group.Name</h5>
+        </div>
+        <div class="card-body">
+            <h6>Участники группы:</h6>
+            @if (Model.Group.Users != null && Model.Group.Users.Any())
+            {
+                <ul>
+                    @foreach (var user in Model.Group.Users)
+                    {
+                        <li>@user.UserName</li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p>В этой группе пока нет других участников.</p>
+            }
+        </div>
+    </div>
+}
+else
+{
+    <p>Вы не состоите в группе. <a asp-action="JoinGroup" asp-controller="Account">Присоединиться к группе</a></p>
+}
+
+<a asp-action="Index" asp-controller="Home" class="btn btn-secondary">Вернуться на главную</a>
